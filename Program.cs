@@ -1,3 +1,5 @@
+using Aggregator.AuxiliaryServices;
+using Aggregator.DataFetchers;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +9,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<Animevost>();
+builder.Services.AddScoped<Anilibria>();
+builder.Services.AddSingleton<PeriodicTask>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<PeriodicTask>());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
