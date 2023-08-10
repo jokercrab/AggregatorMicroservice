@@ -1,9 +1,0 @@
-﻿@Aspnet_Back_HostAddress = https://localhost:7221
-
-GET {{Aspnet_Back_HostAddress}}/api/test
-
-###
-
-GET {{Aspnet_Back_HostAddress}}/api/updates/anilibria
-
-###
