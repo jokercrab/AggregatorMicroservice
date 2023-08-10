@@ -25,6 +25,7 @@ public class PeriodicTask : BackgroundService
             {
                 if (IsEnabled)
                 {
+                    // TODO: #2 Move this section to separete function and make first call from constructor. @jokercrab
                     await using AsyncServiceScope asyncscope = _scopeFactory.CreateAsyncScope();
                     Anilibria anilibriaService = asyncscope.ServiceProvider.GetRequiredService<Anilibria>();
                     Animevost animevostService = asyncscope.ServiceProvider.GetRequiredService<Animevost>();
@@ -34,6 +35,7 @@ public class PeriodicTask : BackgroundService
                         anilibriaService.GetUpdates(30)
                     };
                     await Task.WhenAll(taskList);
+                    //=====================================================
                     _execCount++;
                     _logger.LogInformation(
                         $"Executed periodic fetching. Count: {_execCount}"
