@@ -1,62 +1,42 @@
-using System.Text.Json.Serialization;
-
-namespace Aspnet_Back.DataStructs;
+﻿using System;
+namespace Aggregator.DataStructs;
 
 public class Anime
 {
-    public Posters? Posters { get; set; }
-    public Type? Type { get; set; }
-    public Status? Status { get; set; }
-    public string? Code { get; set; }
-    public Names? Names { get; set; }
-    public IEnumerable<string>? Genres { get; set; }
-    public string? Source;
+    public Names Names { get; set; }
+    public string Poster { get; set; }
+    public string About { get; set; }
+    public EpisodesInfo Episodes { get; set; }
+    public string CodeName { get; set; }
+    public string Source { get; set; }
+    public string Host{ get; set; }
+    public DateTimeOffset Updated { get; set; }
+    public Anime(Names Names, string Poster, string About, string CodeName,
+                string Source, EpisodesInfo Episodes, DateTimeOffset Updated)
+    {
+        this.Names = Names;
+        this.Poster = Poster;
+        this.About = About;
+        this.CodeName = CodeName;
+        this.Source = Source;
+        this.Episodes = Episodes;
+        this.Updated = Updated;
+    }
+    public Anime(AnilibraiDataStruct anilibria)
+    {
+        Names = anilibria.Names;
+        Poster = anilibria.Posters.Medium.Url;
+        About = anilibria.Type.FullString;
+        Episodes = anilibria.Player.Episodes;
+        Updated = DateTimeOffset.FromUnixTimeSeconds(anilibria.Updated);
+        CodeName = anilibria.Code;
+        Host = "https://www.anilibria.tv/";
+        Source = "Anilibria";
 
-}
-public class Names
-{
-    public string? Ru { get; set; }
-    public string? En { get; set; }
-    public string? Alternative { get; set; }
-}
+    }
+    public Anime()
+    {
 
-public class PosterOriginal
-{
-    public string? Url { get; set; }
-    public object? Raw_base64_file { get; set; }
-}
-public class PosterSmall:PosterOriginal
-{
+    }
 
-}
-public class PosterMedium:PosterOriginal
-{
-
-}
-
-
-public class Posters
-{
-    public PosterSmall? Small { get; set; }
-    public PosterMedium? Medium { get; set; }
-    public PosterOriginal? Original { get; set; }
-}
-
-
-public class Status
-{
-    [JsonPropertyName("string")]
-    public string? Name { get; set; }
-    public int Code { get; set; }
-}
-
-public class Type
-{
-    [JsonPropertyName("full_string")]
-    public string? FullString { get; set; }
-    public int Code { get; set; }
-    [JsonPropertyName("string")]
-    public string? ShortString { get; set; }
-    public int? Episodes { get; set; }
-    public int? Length { get; set; }
 }
