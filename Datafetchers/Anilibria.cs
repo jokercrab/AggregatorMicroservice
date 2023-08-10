@@ -1,11 +1,11 @@
 using System.Text.Json.Nodes;
 using System.Text.Json;
-using Aspnet_Back.DataStructs;
+using Aggregator.DataStructs;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Collections;
 using System.Net.Http.Headers;
 
-namespace Aspnet_Back.Datafetchers;
+namespace Aggregator.DataFetchers;
 
 public class Anilibria
 {
@@ -25,7 +25,7 @@ public class Anilibria
         var query = QueryHelpers.AddQueryString(
             "/v3/title/updates",
             new Dictionary<string, string?>{
-                {"filter", "code,names,posters,status,type,genres"},
+                {"filter", "code,names,posters,status,type,genres,player.episodes,updated"},
                 {"since", timestamp.ToString()},
                 {"limit",limit.ToString()}
             });
@@ -37,18 +37,22 @@ public class Anilibria
             json = node!["list"];
 
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             throw new Exception($"{ex.Message}\n AnilibriaUpdates.GetUpdates");
         }
 
         if (json == null)
             return null;
-        var result = json.Deserialize<IEnumerable<Anime>>
+        var jsonResult = json.Deserialize<AnilibraiDataStruct[]>
         (new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-        foreach (var item in result)
+
+        if(jsonResult == null)
+            return null;
+        var result = new Anime[jsonResult.Length];
+        for(int i=0;i<result.Length;i++)
         {
-            item.Source = "Anilibria";
+            result[i] = new Anime(jsonResult[i]);
         }
         return result;
     }
@@ -56,6 +60,7 @@ public class Anilibria
     {
         var offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);
         return local ? offset.LocalDateTime : offset.UtcDateTime;
+        
     }
 
 
