@@ -1,4 +1,6 @@
-﻿using Aggregator.DataFetchers;
+﻿using System.Collections;
+using Aggregator.DataFetchers;
+using Aggregator.DataStructs;
 namespace Aggregator.AuxiliaryServices;
 
 public class PeriodicTask : BackgroundService
@@ -6,17 +8,20 @@ public class PeriodicTask : BackgroundService
     private readonly ILogger<PeriodicTask> _logger;
     private readonly TimeSpan _period = TimeSpan.FromHours(1);
     private readonly IServiceScopeFactory _scopeFactory;
+    private IEnumerable<Anime> _animes;
     private int _execCount = 0;
     public bool IsEnabled { get; set; }
+    public IEnumerable<Anime> Animes { get { return _animes; }}
     public PeriodicTask(ILogger<PeriodicTask> logger, IServiceScopeFactory factory)
     {
         _logger = logger;
         _scopeFactory = factory;
+        CollectInfo();
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using PeriodicTimer timer = new(_period);
-        
+
         while (
             !stoppingToken.IsCancellationRequested &&
             await timer.WaitForNextTickAsync(stoppingToken))
@@ -25,15 +30,9 @@ public class PeriodicTask : BackgroundService
             {
                 if (IsEnabled)
                 {
-                    await using AsyncServiceScope asyncscope = _scopeFactory.CreateAsyncScope();
-                    Anilibria anilibriaService = asyncscope.ServiceProvider.GetRequiredService<Anilibria>();
-                    Animevost animevostService = asyncscope.ServiceProvider.GetRequiredService<Animevost>();
-                    var taskList = new List<Task>
-                    {
-                        animevostService.GetUpdates(),
-                        anilibriaService.GetUpdates(30)
-                    };
-                    await Task.WhenAll(taskList);
+                    // TODO: #2 Move this section to separete function and make first call from constructor. @jokercrab
+                    
+                    //=====================================================
                     _execCount++;
                     _logger.LogInformation(
                         $"Executed periodic fetching. Count: {_execCount}"
@@ -51,5 +50,19 @@ public class PeriodicTask : BackgroundService
                 );
             }
         }
+    }
+    private async Task CollectInfo()
+    {
+        await using AsyncServiceScope asyncscope = _scopeFactory.CreateAsyncScope();
+        Anilibria anilibriaService = asyncscope.ServiceProvider.GetRequiredService<Anilibria>();
+        Animevost animevostService = asyncscope.ServiceProvider.GetRequiredService<Animevost>();
+        var taskList = new List<Task<IEnumerable<Anime>>>
+        {
+            animevostService.GetUpdates(),
+            anilibriaService.GetUpdates(30)
+        };
+        await Task.WhenAll(taskList);
+        _animes = taskList.SelectMany(task => task.Result);
+        
     }
 }

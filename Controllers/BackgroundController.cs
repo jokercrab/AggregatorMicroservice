@@ -6,15 +6,12 @@ namespace Aggregator.Controllers;
 public class BackgroundController : ControllerBase
 {
     private readonly ILogger<BackgroundController> _logger;
-    private readonly IHttpClientFactory _clientFactory;
     private readonly PeriodicTask _backTask;
 
-    public BackgroundController(IHttpClientFactory clientFactory, 
-                                ILogger<BackgroundController> logger,
+    public BackgroundController(ILogger<BackgroundController> logger,
                                 PeriodicTask periodicTask)
     {
         _logger = logger;
-        _clientFactory = clientFactory;
         _backTask = periodicTask;
     }
 
