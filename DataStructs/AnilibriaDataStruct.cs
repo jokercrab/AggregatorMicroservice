@@ -63,7 +63,7 @@ public class Status
 {
     [JsonPropertyName("string")]
     public string? Name { get; set; }
-    public int Code { get; set; }
+    public int? Code { get; set; }
 }
 public class Player
 {
