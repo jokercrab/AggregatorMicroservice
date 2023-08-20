@@ -23,7 +23,7 @@ public class FetchUpdatesController : ControllerBase
         _animevostService = new Animevost(_clientFactory.CreateClient());
     }
 
-    [HttpGet]
+    [HttpGet]   
     [ProducesResponseType(StatusCodes.Status418ImATeapot)]
     public async Task<IActionResult> GetUpdates()
     {
