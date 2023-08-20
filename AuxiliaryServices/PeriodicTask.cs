@@ -12,10 +12,11 @@ public class PeriodicTask : BackgroundService
     private int _execCount = 0;
     public bool IsEnabled { get; set; }
     public IEnumerable<Anime> Animes { get { return _animes; }}
-    public PeriodicTask(ILogger<PeriodicTask> logger, IServiceScopeFactory factory)
+    public PeriodicTask(ILogger<PeriodicTask> logger, IServiceScopeFactory factory,IConfiguration configuration)
     {
         _logger = logger;
         _scopeFactory = factory;
+        IsEnabled = configuration.GetValue<bool>("IsBackground");
         CollectInfo();
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
