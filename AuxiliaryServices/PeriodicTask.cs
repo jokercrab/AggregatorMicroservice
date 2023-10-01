@@ -31,9 +31,7 @@ public class PeriodicTask : BackgroundService
             {
                 if (IsEnabled)
                 {
-                    // TODO: #2 Move this section to separete function and make first call from constructor. @jokercrab
-                    
-                    //=====================================================
+                    await CollectInfo();
                     _execCount++;
                     _logger.LogInformation(
                         $"Executed periodic fetching. Count: {_execCount}"
@@ -64,6 +62,13 @@ public class PeriodicTask : BackgroundService
         };
         await Task.WhenAll(taskList);
         _animes = taskList.SelectMany(task => task.Result);
+        int i=0;
+        foreach (Anime item in _animes)
+        {
+            item.Id=i;
+            i++;
+        }
+            
         
     }
 }

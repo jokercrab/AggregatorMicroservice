@@ -3,6 +3,7 @@ namespace Aggregator.DataStructs;
 
 public class Anime
 {
+    public int Id {get;set;}
     public Names Names { get; set; }
     public string Poster { get; set; }
     public string About { get; set; }
