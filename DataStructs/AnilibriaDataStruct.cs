@@ -78,18 +78,29 @@ public class EpisodesInfo
     public EpisodesInfo() { }
     public EpisodesInfo(string fullInfo)
     {
-        try
+        if (fullInfo == "")
         {
-            var splited = fullInfo.Split('-');
-            First = int.Parse(splited[0]);
-            Last = int.Parse(splited[1]);
-        }
-        catch(Exception){}
-        finally
-        {
-            FulString = fullInfo;
+            First = 1;
+            Last = 1;
+            FulString = "1-1";
 
         }
+        else
+        {
+            try
+            {
+                var splited = fullInfo.Split('-');
+                First = int.Parse(splited[0]);
+                Last = int.Parse(splited[1]);
+            }
+            catch (Exception) { }
+            finally
+            {
+                FulString = fullInfo;
+
+            }
+        }
+
 
     }
 }
