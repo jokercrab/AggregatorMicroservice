@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Aggregator.AuxiliaryServices;
+using Aggregator.Services;
 namespace Aggregator.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]

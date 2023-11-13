@@ -1,5 +1,7 @@
-﻿using Aggregator.AuxiliaryServices;
+﻿using Aggregator.Services;
+using Aggregator.DataStructs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace TVSeriesAgregator;
 [ApiController]
@@ -8,17 +10,26 @@ public class FastUpdateFetch : ControllerBase
 {
     private readonly PeriodicTask _backgroundServie;
     private readonly ILogger<FastUpdateFetch> _logger;
-    public FastUpdateFetch(ILogger<FastUpdateFetch> logger, PeriodicTask periodicTask)
+    private readonly IDataBase _dataBase;
+    public FastUpdateFetch(ILogger<FastUpdateFetch> logger, PeriodicTask periodicTask, 
+                            IDataBase dataBase)
     {
         _backgroundServie = periodicTask;
         _logger = logger;
+        _dataBase = dataBase;
     }
     [HttpGet]
-    public IActionResult GetUpdates()
+    public async Task<IActionResult> GetUpdates()
     {
         _logger.LogInformation($"Local updates requested at {DateTime.Now}");
-        if (_backgroundServie.Animes is null)
-            return Problem("No updates recieved yet, pls try again later!");
-        return Ok(_backgroundServie.Animes);
+        try
+        {
+            var animeList = await _dataBase.Get();
+            return Ok(animeList);
+
+        }catch(Exception ex){
+            _logger.LogError($"Unexpected exception happend at FastUpdateFetch.GetUpdates: {ex.Message}",ex);
+            return NotFound();
+        }
     }
 }

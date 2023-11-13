@@ -1,13 +1,17 @@
-using Aggregator.AuxiliaryServices;
+using Aggregator.Services;
 using Aggregator.DataFetchers;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Aggregator.DataStructs;
+using System.Net.Http.Headers;
 
 
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 //CORS
 var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -21,24 +25,14 @@ builder.Services.AddCors(options =>
                       });
 });
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddHttpClient();
+builder.Services.AddConfig(builder.Configuration)
+                .AddDependencyGroup();
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<Animevost>();
-builder.Services.AddScoped<Anilibria>();
-builder.Services.AddSingleton<PeriodicTask>();
-builder.Services.AddHostedService(provider => provider.GetRequiredService<PeriodicTask>());
-var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+var app = builder.Build();
+app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
 
@@ -46,5 +40,7 @@ app.UseAuthorization();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
+
+
 
 app.Run();
