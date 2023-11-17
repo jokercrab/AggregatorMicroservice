@@ -6,11 +6,12 @@ using TVSeriesAgregator.DataStructs;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Aggregator.Controllers;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/[controller]")]
 public class FetchUpdatesController : ControllerBase
 {
 
@@ -24,31 +25,34 @@ public class FetchUpdatesController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status418ImATeapot)]
-    public async Task<IActionResult> GetUpdates() 
+    public async Task<IActionResult> GetUpdates()
     {
         _logger.LogInformation(
             "Updates requested from {RemoteIpAddress}",
             HttpContext.Connection);
-        IAsyncEnumerable<Anime> mergedStream;
+        
         try
         {
+            // Get all available sources
             using var fetcherEnum = _fetchers.GetEnumerator();
+            // Container for streams
             var streams = new IAsyncEnumerable<Anime>[_fetchers.Count()];
+            // Start fetching data
             for (int i = 0; fetcherEnum.MoveNext(); i++)
                 streams[i] = fetcherEnum.Current.GetUpdates();
-            mergedStream = streams.Merge();
-
+            // Merge to one stream
+            IAsyncEnumerable<Anime> mergedStream = streams.Merge();
+            return Ok(mergedStream);
 
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error occured while processing request {ex.Message}",HttpContext.Connection);
+            _logger.LogError($"Error occured while processing request {ex.Message}", HttpContext.Connection);
             return Problem("Some of the sources did not return result", statusCode: StatusCodes.Status418ImATeapot);
 
         }
+        
 
-
-        return Ok(mergedStream);
     }
 
 }

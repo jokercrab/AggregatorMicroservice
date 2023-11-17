@@ -20,7 +20,9 @@ public class Anilibria:IDataFetcher
     public async IAsyncEnumerable<Anime> GetUpdates()
     {
         JsonNode? json;
+        // Get timestamp that indicates last 7 days
         var timestamp = DateTimeOffset.Now.AddDays(-7).ToUnixTimeSeconds();
+        // Query composition
         var query = QueryHelpers.AddQueryString(
             "/v3/title/updates",
             new Dictionary<string, string?>{
@@ -30,8 +32,9 @@ public class Anilibria:IDataFetcher
             });
         try
         {
+            // API call
             var response = await _httpClient.GetAsync(query);
-
+            // Filtering the result
             var node = JsonNode.Parse(response.Content.ReadAsStringAsync().Result);
             json = node!["list"];
 
@@ -40,22 +43,22 @@ public class Anilibria:IDataFetcher
         {
             throw new Exception($"{ex.Message}\n AnilibriaUpdates.GetUpdates");
         }
-
+        // if did not get any data - there is nothing to return
         if (json == null)
             yield break;
+        // deserialize output
         var jsonResult = json.Deserialize<AnilibraiDataStruct[]>
         (new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
         if(jsonResult == null)
             yield break;
+        // generate new array and return
         var result = new Anime[jsonResult.Length];
         for(int i=0;i<result.Length;i++)
-        {
-            //result[i] = new Anime(jsonResult[i]);
             yield return new Anime(jsonResult[i]);
-        }
         
     }
+    //Unix seconds to datetime converter
     private DateTime SecondsToDateTime(long timestamp, bool local = false)
     {
         var offset = DateTimeOffset.FromUnixTimeSeconds(timestamp);

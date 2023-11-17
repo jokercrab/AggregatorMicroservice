@@ -1,5 +1,7 @@
 namespace Aggregator.DataStructs;
-
+/// <summary>
+/// Represents a structure for storing database settings
+/// </summary>
 public class SettingsDB
 {
     public string ConnectionString { get; set; } = null!;

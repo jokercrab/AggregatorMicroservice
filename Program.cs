@@ -1,14 +1,3 @@
-using Aggregator.Services;
-using Aggregator.DataFetchers;
-using MongoDB.Driver;
-using MongoDB.Bson;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Aggregator.DataStructs;
-using System.Net.Http.Headers;
-
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 

@@ -5,16 +5,14 @@ using Microsoft.Extensions.Options;
 
 namespace TVSeriesAgregator;
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/[controller]")]
 public class FastUpdateFetch : ControllerBase
 {
-    private readonly PeriodicTask _backgroundServie;
     private readonly ILogger<FastUpdateFetch> _logger;
     private readonly IDataBase _dataBase;
     public FastUpdateFetch(ILogger<FastUpdateFetch> logger, PeriodicTask periodicTask, 
                             IDataBase dataBase)
     {
-        _backgroundServie = periodicTask;
         _logger = logger;
         _dataBase = dataBase;
     }
@@ -24,6 +22,7 @@ public class FastUpdateFetch : ControllerBase
         _logger.LogInformation($"Local updates requested at {DateTime.Now}");
         try
         {
+            // Get all records from database
             var animeList = await _dataBase.Get();
             return Ok(animeList);
 

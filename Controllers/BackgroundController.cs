@@ -2,7 +2,7 @@
 using Aggregator.Services;
 namespace Aggregator.Controllers;
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/[controller]")]
 public class BackgroundController : ControllerBase
 {
     private readonly ILogger<BackgroundController> _logger;
@@ -22,6 +22,7 @@ public class BackgroundController : ControllerBase
     [HttpPatch]
     public IActionResult SetState([FromQuery] bool isEnabled){
         _backTask.IsEnabled = isEnabled;
+        _logger.LogInformation($"Background state was set to {_backTask.IsEnabled}");
         return Accepted($"Background status is {_backTask.IsEnabled}");
     }
 }

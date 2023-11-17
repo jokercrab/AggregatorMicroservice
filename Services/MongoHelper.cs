@@ -2,8 +2,10 @@ using MongoDB.Driver;
 using Aggregator.DataStructs;
 
 using Microsoft.Extensions.Options;
-using System.Drawing;
 namespace Aggregator.Services;
+/// <summary>
+/// Used to interact with mongo database
+/// </summary>
 public class MongoHelper : IDataBase
 {
     private IMongoCollection<Anime> _animeCollection;
@@ -27,7 +29,6 @@ public class MongoHelper : IDataBase
     public async Task<bool> Exists(string codeName) => await _animeCollection.Find<Anime>(a => a.CodeName == codeName).AnyAsync();
     public async Task<bool> Replace(Anime anime)
     {
-        //var update = Builders<Anime>.Update.Set(a=>a,anime);
         var filter = Builders<Anime>.Filter.Eq(a => a.CodeName, anime.CodeName);
         var result = await _animeCollection.ReplaceOneAsync(filter, anime);
         return result.IsAcknowledged;

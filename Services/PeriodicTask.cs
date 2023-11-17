@@ -4,7 +4,9 @@ using Aggregator.DataStructs;
 
 using Microsoft.AspNetCore.Identity;
 namespace Aggregator.Services;
-
+/// <summary>
+/// Periodic service for background updating
+/// </summary>
 public class PeriodicTask : BackgroundService
 {
     private readonly ILogger<PeriodicTask> _logger;
@@ -68,6 +70,7 @@ public class PeriodicTask : BackgroundService
 
             // Merge result into one stream
             mergedStream = tasks.Merge();
+            
         }
         // Process each record when ready
         await foreach (var result in mergedStream)
