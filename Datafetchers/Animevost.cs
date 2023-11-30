@@ -97,11 +97,20 @@ public partial class Animevost : IDataFetcher
     /// <returns>A list of newly constructed Anime objects</returns>
     public async IAsyncEnumerable<Anime> GetUpdates()
     {
-        var links = await GetLinks();
-        for (int i = 0; i < links.Count; i++)
+        //Get list of links and start extracting data from all of them
+        var tasks = GetLinks().Result.Select(async link => await ExtractInfo(link));
+
+        var remaining = new List<Task<Anime>>(tasks);
+        // Return extracted data one by one as extraction process completes
+        while (remaining.Count != 0)
         {
-            yield return await ExtractInfo(links[i]);
+            var task = await Task.WhenAny(remaining);
+            remaining.Remove(task);
+            yield return await task;
         }
+
+
+
 
     }
 
